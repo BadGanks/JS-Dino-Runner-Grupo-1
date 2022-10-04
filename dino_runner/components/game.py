@@ -15,13 +15,14 @@ class Game:
         self.game_speed = 20
         self.x_pos_bg = 0
         self.y_pos_bg = 380
-
         self.player = Dinosaur()
     def update(self):
+        
         user_input = pygame.key.get_pressed()
         self.player.update(user_input)
+
     def run(self):
-        # Game loop: events - update - draw
+        #Game loop: events - update - draw
         self.playing = True
         while self.playing:
             self.events()
