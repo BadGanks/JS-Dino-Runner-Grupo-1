@@ -31,7 +31,7 @@ class Game:
         
         user_input = pygame.key.get_pressed()
         self.player.update(user_input)
-        self._obstacle_manager.update(self.game_speed, self.player, self.on_death)
+        self._obstacle_manager.update(self.game_speed, self.player, self.on_death,)
         self.score.update(self)
 
     def execute(self):
@@ -77,6 +77,8 @@ class Game:
             self.screen.blit(BG, (image_width + self.x_pos_bg, self.y_pos_bg))
             self.x_pos_bg = 0
         self.x_pos_bg -= self.game_speed
+
+
     def show_menu(self):
         self.screen.fill((255,255,255))
         half_screen_height = SCREEN_HEIGHT // 2
@@ -91,30 +93,56 @@ class Game:
             self.death_count > 0
             font = pygame.font.Font(FONT_STYLE, 30)
             text_component = font.render("PRESS THE KEY TO CONTINUE PLAYING", True, (0,0,0))
-            text_component = font.render(f"SCORE TOTAL IS:{self.score} " ,True (500,300,100))
             text_rect = text_component.get_rect()
             text_rect.center = (half_screen_width, half_screen_height)
             self.screen.blit(text_component, text_rect)
-            #mostrar volver a jugar
-            #mostrar muertes actuales
-            #mostrar el puntaje
+
+            font = pygame.font.Font(FONT_STYLE, 30)
+            text_component = font.render(f"NUMBER OF DEATHS: {self.death_count}", True, (0,0,0))
+            text_rect = text_component.get_rect()
+            text_rect.center = (550, 400)
+            self.screen.blit(text_component, text_rect)
+            
+            font = pygame.font.Font(FONT_STYLE, 30)
+            text_component = font.render(f"Score: {self.score.score-1}", True, (0,0,0))
+            text_rect = text_component.get_rect()
+            text_rect.center = (550, 100)
+            self.screen.blit(text_component, text_rect)
+
+        
         
         self.screen.blit(RUNNING[0], (half_screen_width - 30, half_screen_height - 140))
         pygame.display.update()
         self.handle_key_events_on_menu()
+        
+
     def handle_key_events_on_menu(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.playing = False
 
-            elif event.type == pygame.KEYDOWN:
-                self.run()
 
+            elif event.type == pygame.KEYDOWN:
+                self.score.reset_score()
+                self.run()
+                
+           
+
+    
     def on_death(self):
         self.playing = False
         self.death_count += 1
         print("MORI")
         print(f"Numero de Muertes: {self.death_count}")
+
+    
+
+    
+    
+
+
+
+
 
 
 
