@@ -55,9 +55,10 @@ class Game:
         while self.executing:
             if not self.playing:
                 self.show_menu()
-
-            
-        pygame.quit()
+            if not self.playing:
+                pygame.mixer.music.load('dino_runner/assets/music/inicio.mp3')
+                pygame.mixer.music.play()  
+                 
 
     def run(self):
 
@@ -153,7 +154,7 @@ class Game:
         is_invencible = self.player.type == SHIELD_TYPE or self.heart_manager.heart_count > 0
         has_hammer = self.player.type == HAMMER_TYPE
         if has_hammer:
-            self.game_speed = 20
+            self.game_speed = 30
             if not has_hammer:
                 self.heart_manager.redeuce_heart()    
 

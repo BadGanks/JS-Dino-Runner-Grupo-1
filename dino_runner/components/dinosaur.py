@@ -1,8 +1,9 @@
 from enum import Flag
 from unittest.mock import DEFAULT
-from dino_runner.utils.constants import DEFAULT_TYPE, DUCKING, DUCKING_HAMMER, DUCKING_SHIELD, HAMMER_TYPE, JUMPING, JUMPING_HAMMER, JUMPING_SHIELD, RUNNING, RUNNING_HAMMER, RUNNING_SHIELD, MP3_DIR, SHIELD_TYPE, SOUND_JUMP
+from dino_runner.utils.constants import DEFAULT_TYPE, DUCKING, DUCKING_HAMMER, DUCKING_SHIELD, HAMMER_TYPE, JUMPING, JUMPING_HAMMER, JUMPING_SHIELD, RUNNING, RUNNING_HAMMER, RUNNING_SHIELD, SHIELD_TYPE
 from pygame.sprite import Sprite
 import pygame
+
 DUCK_IMG = {DEFAULT_TYPE: DUCKING, SHIELD_TYPE: DUCKING_SHIELD, HAMMER_TYPE: DUCKING_HAMMER}
 JUMP_IMG = {DEFAULT_TYPE: JUMPING, SHIELD_TYPE: JUMPING_SHIELD, HAMMER_TYPE: JUMPING_HAMMER}
 RUN_IMG = {DEFAULT_TYPE: RUNNING, SHIELD_TYPE: RUNNING_SHIELD, HAMMER_TYPE: RUNNING_HAMMER}
@@ -26,10 +27,6 @@ class Dinosaur(Sprite):
         self.dino_duck = True
         self.power_up_time_up = 0
         self.has_power_up = False
-        self.music = pygame.mixer.music.load()
-        self.sound = pygame.mixer.Sound()
-        
-
        
     def update(self, user_input):
         if self.dino_run:
@@ -38,11 +35,12 @@ class Dinosaur(Sprite):
             self.jump()
         elif self.dino_duck:
             self.duck()
+
         if user_input [pygame.K_UP] and not self.dino_jump:
             self.dino_duck = False
             self.dino_jump =True
             self.dino_run = False
-            self.sound.play(SOUND_JUMP)
+            
         elif user_input[pygame.K_DOWN] and not self.dino_jump:
             self.dino_duck = True
             self.dino_jump = False
@@ -52,9 +50,11 @@ class Dinosaur(Sprite):
             self.dino_duck = False
             self.dino_jump = False
             self.dino_run = True
+            
         if self.step_index >= 9:
             self.step_index = 0
-
+        
+        
 
     def run(self):
         self.image = RUN_IMG [self.type][self.step_index // 5]
@@ -64,6 +64,7 @@ class Dinosaur(Sprite):
         self.step_index += 1
 
     def jump(self):
+
 
         pygame.key.get_pressed()
         self.image = JUMP_IMG[self.type]
@@ -75,6 +76,8 @@ class Dinosaur(Sprite):
             self.dino_jump = False
             self.dino_rect.y = self.Y_POS
             self.jump_velocity = self.JUMP_VELOCITY
+        
+
     def duck(self):
         self.image = DUCK_IMG[self.type][self.step_index // 5] 
         
