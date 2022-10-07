@@ -3,12 +3,14 @@ from unittest.mock import DEFAULT
 import pygame
 from dino_runner.components.dinosaur import Dinosaur
 from dino_runner.components.player_hearts.player_hear_manager import PlayerHeartManager
-from dino_runner.components.power_ups.power_up import PowerUp
+from dino_runner.components.power_ups.hammer import Hammer
+
 from dino_runner.components.power_ups.power_up_manager import PowerUpManager
 from dino_runner.components.power_ups.shield import Shield 
 from dino_runner.components.score import Score
-from dino_runner.utils.constants import BG, DEFAULT_TYPE, ICON, SCREEN_HEIGHT, SCREEN_WIDTH, SHIELD_TYPE, TITLE, FPS, RUNNING, FONT_STYLE
+from dino_runner.utils.constants import BG, DEFAULT_TYPE, HAMMER_TYPE, ICON, SCREEN_HEIGHT, SCREEN_WIDTH, SHIELD_TYPE, TITLE, FPS, RUNNING, FONT_STYLE
 from dino_runner.components.obstacles.obstade_manager import ObstacleManager
+from dino_runner.components.obstacles.obstable import Obstacle
 
 
 
@@ -19,6 +21,7 @@ class Game:
         pygame.init()
         pygame.display.set_caption(TITLE)
         pygame.display.set_icon(ICON)
+        
         self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
         self.clock = pygame.time.Clock()
         self.playing = False
@@ -27,13 +30,16 @@ class Game:
         self.x_pos_bg = 0
         self.y_pos_bg = 380
         self.shields = [Shield()]
+        self.hammer = [Hammer()]
         self.player = Dinosaur()
         self._obstacle_manager = ObstacleManager()
         self.power_up_manager = PowerUpManager()
         self.heart_manager = PlayerHeartManager()
-        
         self.death_count = 0
         self.score = Score()
+        
+
+    
 
     def update(self):
         
@@ -43,6 +49,7 @@ class Game:
         self.score.update(self)
         self.power_up_manager.update(self.game_speed, self.player, self.score.score)
         self.power_up_manager.generate_power_up(self.score.score)
+        
     def execute(self):
         self.executing = True
         while self.executing:
@@ -140,18 +147,21 @@ class Game:
                 self.score.reset_score()
                 self.game_speed = 20
                 self.run()
-                self.heart_manager.redeuce_heart()
-                
-           
 
-    
     def on_death(self):
         has_shield = self.player.type == SHIELD_TYPE
         is_invencible = self.player.type == SHIELD_TYPE or self.heart_manager.heart_count > 0
-        self.heart_manager.redeuce_heart()
-        if has_shield:
-            self.heart_manager.redeuce_heart()
+        has_hammer = self.player.type == HAMMER_TYPE
+        if has_hammer:
+            self.game_speed = 20
+            if not has_hammer:
+                self.heart_manager.redeuce_heart()    
 
+            elif has_hammer:
+                self._obstacle_manager.obstacles.remove == self.heart_manager.incrase_heart()
+            
+        if not has_shield:
+            self.heart_manager.redeuce_heart()
         if not is_invencible:
                 pygame.time.delay(500)
                 self.playing = False
@@ -174,5 +184,8 @@ class Game:
                 self.player.has_power_up = False
                 self.player.type = DEFAULT_TYPE
 
-    
+
+
+
+       
     

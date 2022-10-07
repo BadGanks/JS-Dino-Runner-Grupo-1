@@ -7,7 +7,8 @@ class PlayerHeartManager:
     
     def redeuce_heart(self):
         self.heart_count -= 1
-    
+    def incrase_heart(self):
+        self.heart_count += 2
     def draw(self, screen):
         x_position = 10
         y_position = 20

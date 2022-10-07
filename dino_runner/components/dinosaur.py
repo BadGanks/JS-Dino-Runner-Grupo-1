@@ -1,12 +1,11 @@
 from enum import Flag
 from unittest.mock import DEFAULT
-from dino_runner.utils.constants import DEFAULT_TYPE, DUCKING, DUCKING_HAMMER, DUCKING_SHIELD, JUMPING, JUMPING_SHIELD, RUNNING, RUNNING_SHIELD, SHIELD, SHIELD_TYPE
+from dino_runner.utils.constants import DEFAULT_TYPE, DUCKING, DUCKING_HAMMER, DUCKING_SHIELD, HAMMER_TYPE, JUMPING, JUMPING_HAMMER, JUMPING_SHIELD, RUNNING, RUNNING_HAMMER, RUNNING_SHIELD, MP3_DIR, SHIELD_TYPE, SOUND_JUMP
 from pygame.sprite import Sprite
 import pygame
-
-DUCK_IMG = {DEFAULT_TYPE: DUCKING, SHIELD_TYPE: DUCKING_SHIELD}
-JUMP_IMG = {DEFAULT_TYPE: JUMPING, SHIELD_TYPE: JUMPING_SHIELD}
-RUN_IMG = {DEFAULT_TYPE: RUNNING, SHIELD_TYPE: RUNNING_SHIELD}
+DUCK_IMG = {DEFAULT_TYPE: DUCKING, SHIELD_TYPE: DUCKING_SHIELD, HAMMER_TYPE: DUCKING_HAMMER}
+JUMP_IMG = {DEFAULT_TYPE: JUMPING, SHIELD_TYPE: JUMPING_SHIELD, HAMMER_TYPE: JUMPING_HAMMER}
+RUN_IMG = {DEFAULT_TYPE: RUNNING, SHIELD_TYPE: RUNNING_SHIELD, HAMMER_TYPE: RUNNING_HAMMER}
 
 class Dinosaur(Sprite):
     X_POS = 80
@@ -27,7 +26,9 @@ class Dinosaur(Sprite):
         self.dino_duck = True
         self.power_up_time_up = 0
         self.has_power_up = False
-
+        self.music = pygame.mixer.music.load()
+        self.sound = pygame.mixer.Sound()
+        
 
        
     def update(self, user_input):
@@ -41,10 +42,12 @@ class Dinosaur(Sprite):
             self.dino_duck = False
             self.dino_jump =True
             self.dino_run = False
+            self.sound.play(SOUND_JUMP)
         elif user_input[pygame.K_DOWN] and not self.dino_jump:
             self.dino_duck = True
             self.dino_jump = False
             self.dino_run = False
+
         elif not self.dino_jump and not self.dino_duck:
             self.dino_duck = False
             self.dino_jump = False
