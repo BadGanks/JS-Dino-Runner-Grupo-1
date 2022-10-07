@@ -1,7 +1,13 @@
+from multiprocessing.pool import RUN
+from unittest.mock import DEFAULT
 import pygame
-from dino_runner.components.dinosaur import Dinosaur 
+from dino_runner.components.dinosaur import Dinosaur
+from dino_runner.components.player_hearts.player_hear_manager import PlayerHeartManager
+from dino_runner.components.power_ups.power_up import PowerUp
+from dino_runner.components.power_ups.power_up_manager import PowerUpManager
+from dino_runner.components.power_ups.shield import Shield 
 from dino_runner.components.score import Score
-from dino_runner.utils.constants import BG, ICON, SCREEN_HEIGHT, SCREEN_WIDTH, TITLE, FPS, RUNNING, FONT_STYLE
+from dino_runner.utils.constants import BG, DEFAULT_TYPE, ICON, SCREEN_HEIGHT, SCREEN_WIDTH, SHIELD_TYPE, TITLE, FPS, RUNNING, FONT_STYLE
 from dino_runner.components.obstacles.obstade_manager import ObstacleManager
 
 
@@ -20,9 +26,11 @@ class Game:
         self.game_speed = 20
         self.x_pos_bg = 0
         self.y_pos_bg = 380
-
+        self.shields = [Shield()]
         self.player = Dinosaur()
         self._obstacle_manager = ObstacleManager()
+        self.power_up_manager = PowerUpManager()
+        self.heart_manager = PlayerHeartManager()
         
         self.death_count = 0
         self.score = Score()
@@ -33,7 +41,8 @@ class Game:
         self.player.update(user_input)
         self._obstacle_manager.update(self.game_speed, self.player, self.on_death,)
         self.score.update(self)
-
+        self.power_up_manager.update(self.game_speed, self.player, self.score.score)
+        self.power_up_manager.generate_power_up(self.score.score)
     def execute(self):
         self.executing = True
         while self.executing:
@@ -44,14 +53,16 @@ class Game:
         pygame.quit()
 
     def run(self):
-        #Game loop: events - update - draw
+
+        
         self.playing = True
         self._obstacle_manager.reset_obstacles()
         while self.playing:
             self.events()
             self.update()
             self.draw()
-        
+
+    
 
     def events(self):
         for event in pygame.event.get():
@@ -66,6 +77,9 @@ class Game:
         self.player.draw(self.screen)
         self._obstacle_manager.draw(self.screen)
         self.score.draw(self.screen)
+        self.power_up_manager.draw(self.screen)
+        self.draw_power_up_activate()
+        self.heart_manager.draw(self.screen)
         pygame.display.update()
         pygame.display.flip()
 
@@ -124,25 +138,41 @@ class Game:
 
             elif event.type == pygame.KEYDOWN:
                 self.score.reset_score()
+                self.game_speed = 20
                 self.run()
+                self.heart_manager.redeuce_heart()
                 
            
 
     
     def on_death(self):
-        self.playing = False
-        self.death_count += 1
-        print("MORI")
-        print(f"Numero de Muertes: {self.death_count}")
+        has_shield = self.player.type == SHIELD_TYPE
+        is_invencible = self.player.type == SHIELD_TYPE or self.heart_manager.heart_count > 0
+        self.heart_manager.redeuce_heart()
+        if has_shield:
+            self.heart_manager.redeuce_heart()
+
+        if not is_invencible:
+                pygame.time.delay(500)
+                self.playing = False
+                self.death_count += 1
+        
+        return is_invencible
+            
+           
+    
+    def draw_power_up_activate(self):
+        if self.player.has_power_up:
+            time_to_show = round((self.player.power_up_time_up - pygame.time.get_ticks()) / 1000, 2)
+            if time_to_show >= 0:
+                font = pygame.font.Font(FONT_STYLE, 20)
+                text_component = font.render(f"ENABNLE FOR SECONDS: {time_to_show}", True, (0,0,0))
+                text_rect = text_component.get_rect()
+                text_rect.center = (550, 100)
+                self.screen.blit(text_component, text_rect)
+            else:
+                self.player.has_power_up = False
+                self.player.type = DEFAULT_TYPE
 
     
-
     
-    
-
-
-
-
-
-
-
